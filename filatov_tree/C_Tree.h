@@ -25,6 +25,7 @@ namespace tree
       void Push(int a, CompareFunc compare);
       void ForwardPrint(string& result);
       void BackwardPrint(string& result);
+      void SymmetricPrint(string& result);
    };
 
    class C_Tree
@@ -41,5 +42,6 @@ namespace tree
 
       string ForwardPrint();
       string BackwardPrint();
+      string SymmetricPrint();
    };
 }

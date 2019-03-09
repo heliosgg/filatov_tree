@@ -32,6 +32,15 @@ string tree::C_Tree::BackwardPrint()
    return strResult;
 }
 
+string tree::C_Tree::SymmetricPrint()
+{
+   string strResult("");
+
+   pRoot->SymmetricPrint(strResult);
+
+   return strResult;
+}
+
 void tree::node_t::Push(int a, CompareFunc compare)
 {
    if (this->isEmpty)
@@ -106,4 +115,25 @@ void tree::node_t::BackwardPrint(string& result)
 
    result.append(to_string(this->value));
    result.append(" ");
+}
+
+void tree::node_t::SymmetricPrint(string & result)
+{
+   if (this->isEmpty)
+   {
+      return;
+   }
+
+   if (this->leftPtr)
+   {
+      this->leftPtr->SymmetricPrint(result);
+   }
+
+   result.append(to_string(this->value));
+   result.append(" ");
+
+   if (this->rightPtr)
+   {
+      this->rightPtr->SymmetricPrint(result);
+   }
 }

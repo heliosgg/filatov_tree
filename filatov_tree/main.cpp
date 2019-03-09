@@ -13,7 +13,7 @@ int main()
       pTree.Push(iTemp);
    }
 
-   cout << pTree.BackwardPrint().c_str() << endl;
+   cout << pTree.SymmetricPrint().c_str() << endl;
 
    system("pause");
 
