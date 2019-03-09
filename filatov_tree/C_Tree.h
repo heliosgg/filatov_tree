@@ -23,6 +23,8 @@ namespace tree
       }
 
       void Push(int a, CompareFunc compare);
+      void ForwardPrint(string& result);
+      void BackwardPrint(string& result);
    };
 
    class C_Tree
@@ -33,7 +35,11 @@ namespace tree
       node_t* pRoot;
    public:
       C_Tree();
+      ~C_Tree();
 
-      void Push();
+      void Push(int a);
+
+      string ForwardPrint();
+      string BackwardPrint();
    };
 }
