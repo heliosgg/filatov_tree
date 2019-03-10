@@ -17,8 +17,31 @@ void tree::C_Tree::Push(int a)
 
 void tree::C_Tree::Pop(int a)
 {
+   bool bRootToPop = !m_pRoot->isEmpty && m_pRoot->value == a;
+
+   if (bRootToPop)
+   {
+      node_t* pNewRoot = new node_t;
+
+      pNewRoot->PushSubtree(m_pRoot->leftPtr, compare);
+      pNewRoot->PushSubtree(m_pRoot->rightPtr, compare);
+
+      m_pRoot->leftPtr = nullptr;
+      m_pRoot->rightPtr = nullptr;
+      m_pRoot->isEmpty = true;
+      m_pRoot->value = NULL;
+
+      delete m_pRoot;
+
+      m_pRoot = pNewRoot;
+
+      return;
+   }
+
    node_t* pParent = m_pRoot->FindParent(a);
    node_t* pToPop;
+
+   pParent = m_pRoot->FindParent(a);
 
    if (pParent == nullptr)
    {
