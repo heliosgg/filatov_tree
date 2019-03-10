@@ -23,5 +23,8 @@
     <ClInclude Include="C_Tree.h">
       <Filter>Classes</Filter>
     </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

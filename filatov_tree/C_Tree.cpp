@@ -17,6 +17,10 @@ tree::C_Tree::~C_Tree()
 void tree::C_Tree::Push(int a)
 {
    m_pRoot->Push(a, compare);
+
+#ifdef PUSH_DELAY
+   Sleep(PUSH_DELAY);
+#endif
 }
 
 void tree::C_Tree::Pop(int a)
@@ -109,6 +113,19 @@ string tree::C_Tree::SymmetricPrint()
    m_pRoot->SymmetricPrint(strResult);
 
    return strResult;
+}
+
+void tree::C_Tree::DrawTree(sf::RenderWindow& window, sf::Vector2f rootPos)
+{
+   int counter = 1;
+
+   m_pRoot->GiveZones(counter);
+   m_pRoot->SelfDraw(window, rootPos);
+}
+
+void tree::C_Tree::MakeCopy(C_Tree& another)
+{
+   m_pRoot->MakeCopy(another.GetRoot(), compare);
 }
 
 tree::node_t::~node_t()
@@ -238,6 +255,105 @@ void tree::node_t::PushSubtree(node_t* subtree, CompareFunc compare)
    if (subtree->rightPtr)
    {
       this->PushSubtree(subtree->rightPtr, compare);
+   }
+}
+
+void tree::node_t::SelfDraw(sf::RenderWindow& window, sf::Vector2f newPos,
+   sf::Vector2f prevPos, sf::Color col)
+{
+   if (this == nullptr || this->isEmpty)
+   {
+      return;
+   }
+
+   if (prevPos != sf::Vector2f(-1.f, -1.f))
+   {
+      sf::Vertex line[2] =
+      {
+          sf::Vertex(prevPos, col),
+          sf::Vertex(newPos, col)
+      };
+
+      window.draw(line, 2, sf::Lines);
+   }
+
+   if (this->leftPtr)
+   {
+      this->leftPtr->SelfDraw(window, sf::Vector2f(newPos.x -
+         (TREE_ARC_DELTA * (this->zone - this->leftPtr->zone)),
+         newPos.y + TREE_ARC_DELTA), newPos, TREE_L_ARC_COLOR);
+   }
+
+   if (this->rightPtr)
+   {
+      this->rightPtr->SelfDraw(window, sf::Vector2f(newPos.x +
+         (TREE_ARC_DELTA * (this->rightPtr->zone - this->zone)),
+         newPos.y + TREE_ARC_DELTA), newPos, TREE_R_ARC_COLOR);
+   }
+
+   sf::Vector2f circle_pos(newPos.x - TREE_NODE_RAD, newPos.y - TREE_NODE_RAD);
+
+   sf::CircleShape circle(TREE_NODE_RAD);
+   circle.setPosition(circle_pos);
+   circle.setFillColor(TREE_NODE_COLOR);
+
+   circle.setOutlineThickness(TREE_NODE_OUTLINE_THICKNESS);
+   circle.setOutlineColor(TREE_NODE_OUTLINE_COLOR);
+
+   window.draw(circle);
+
+   sf::Font font;
+   font.loadFromFile(TREE_FONT_PATH);
+
+   sf::Text text(to_string(this->value).c_str(), font);
+   text.setCharacterSize((int)(TREE_NODE_RAD * TREE_FONTSIZE_SCALE));
+   //text.setStyle(sf::Text::Bold);
+   text.setFillColor(TREE_TEXT_COLOR);
+
+   sf::Vector2f txtSize(text.getLocalBounds().width / 2.f, text.getLocalBounds().height);
+
+   text.setPosition(newPos - txtSize);
+
+   window.draw(text);
+}
+
+void tree::node_t::GiveZones(int& counter)
+{
+   if (this->isEmpty)
+   {
+      return;
+   }
+
+   if (this->leftPtr)
+   {
+      this->leftPtr->GiveZones(counter);
+   }
+
+   this->zone = counter++;
+
+   if (this->rightPtr)
+   {
+      this->rightPtr->GiveZones(counter);
+   }
+}
+
+void tree::node_t::MakeCopy(node_t* another, CompareFunc compare)
+{
+   if (this->isEmpty)
+   {
+      return;
+   }
+
+   another->Push(this->value, compare);
+
+   if (this->leftPtr)
+   {
+      this->leftPtr->MakeCopy(another, compare);
+   }
+
+   if (this->rightPtr)
+   {
+      this->rightPtr->MakeCopy(another, compare);
    }
 }
 
