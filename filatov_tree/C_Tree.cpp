@@ -1,24 +1,67 @@
 #include "IncludeSystem.h"
 
 tree::C_Tree::C_Tree() :
-   pRoot(new node_t)
+   m_pRoot(new node_t)
 {
 }
 
 tree::C_Tree::~C_Tree()
 {
+   // TODO: recursive clear
 }
 
 void tree::C_Tree::Push(int a)
 {
-   pRoot->Push(a, compare);
+   m_pRoot->Push(a, compare);
+}
+
+void tree::C_Tree::Pop(int a)
+{
+   node_t* pParent = m_pRoot->FindParent(a);
+   node_t* pToPop;
+
+   if (pParent == nullptr)
+   {
+      return;
+   }
+
+   if (pParent->leftPtr && pParent->leftPtr->value == a)
+   {
+      pToPop = pParent->leftPtr;
+      pParent->leftPtr = nullptr;
+   }
+   else
+   {
+      pToPop = pParent->rightPtr;
+      pParent->rightPtr = nullptr;
+   }
+
+   m_pRoot->PushSubtree(pToPop->leftPtr, compare);
+   m_pRoot->PushSubtree(pToPop->rightPtr, compare);
+
+   delete pToPop;
+}
+
+void tree::C_Tree::Intersect(C_Tree& tree)
+{
+   node_t* pTemp = nullptr;
+
+   while ((pTemp = m_pRoot->FindNotIntersected(tree.GetRoot(), compare)))
+   {
+      Pop(pTemp->value);
+   }
+}
+
+bool tree::C_Tree::IsExist(int a)
+{
+   return m_pRoot->IsExist(a, compare);
 }
 
 string tree::C_Tree::ForwardPrint()
 {
    string strResult("");
 
-   pRoot->ForwardPrint(strResult);
+   m_pRoot->ForwardPrint(strResult);
 
    return strResult;
 }
@@ -27,7 +70,7 @@ string tree::C_Tree::BackwardPrint()
 {
    string strResult("");
 
-   pRoot->BackwardPrint(strResult);
+   m_pRoot->BackwardPrint(strResult);
 
    return strResult;
 }
@@ -36,7 +79,7 @@ string tree::C_Tree::SymmetricPrint()
 {
    string strResult("");
 
-   pRoot->SymmetricPrint(strResult);
+   m_pRoot->SymmetricPrint(strResult);
 
    return strResult;
 }
@@ -117,7 +160,7 @@ void tree::node_t::BackwardPrint(string& result)
    result.append(" ");
 }
 
-void tree::node_t::SymmetricPrint(string & result)
+void tree::node_t::SymmetricPrint(string& result)
 {
    if (this->isEmpty)
    {
@@ -136,4 +179,123 @@ void tree::node_t::SymmetricPrint(string & result)
    {
       this->rightPtr->SymmetricPrint(result);
    }
+}
+
+void tree::node_t::PushSubtree(node_t* subtree, CompareFunc compare)
+{
+   if (subtree == nullptr || subtree->isEmpty)
+   {
+      return;
+   }
+
+   this->Push(subtree->value, compare);
+
+   if (subtree->leftPtr)
+   {
+      this->PushSubtree(subtree->leftPtr, compare);
+   }
+
+   if (subtree->rightPtr)
+   {
+      this->PushSubtree(subtree->rightPtr, compare);
+   }
+}
+
+bool tree::node_t::IsExist(int a, CompareFunc compare)
+{
+   bool bResult = false;
+
+   if (this == nullptr || this->isEmpty)
+   {
+      return false;
+   }
+
+   if (this->value == a)
+   {
+      return true;
+   }
+
+   if (compare(a, this->value))
+   {
+      return this->rightPtr->IsExist(a, compare);
+   }
+   else
+   {
+      return this->leftPtr->IsExist(a, compare);
+   }
+}
+
+tree::node_t* tree::node_t::FindParent(int a)
+{
+   node_t* pTemp;
+
+   if (this->isEmpty)
+   {
+      return nullptr;
+   }
+
+   if (this->leftPtr && !this->leftPtr->isEmpty)
+   {
+      if (this->leftPtr->value == a)
+      {
+         return this;
+      }
+
+      pTemp = this->leftPtr->FindParent(a);
+
+      if (pTemp)
+      {
+         return pTemp;
+      }
+   }
+
+   if (this->rightPtr && !this->rightPtr->isEmpty)
+   {
+      if (this->rightPtr->value == a)
+      {
+         return this;
+      }
+
+      pTemp = this->rightPtr->FindParent(a);
+
+      if (pTemp)
+      {
+         return pTemp;
+      }
+   }
+
+   return nullptr;
+}
+
+tree::node_t* tree::node_t::FindNotIntersected(node_t* another_tree,
+   CompareFunc compare)
+{
+   node_t* pTemp = nullptr;
+
+   if (this->isEmpty)
+   {
+      return nullptr;
+   }
+
+   if (!another_tree->IsExist(this->value, compare))
+   {
+      return this;
+   }
+
+   if (this->leftPtr)
+   {
+      pTemp = this->leftPtr->FindNotIntersected(another_tree, compare);
+
+      if (pTemp)
+      {
+         return pTemp;
+      }
+   }
+
+   if (this->rightPtr)
+   {
+      pTemp = this->rightPtr->FindNotIntersected(another_tree, compare);
+   }
+
+   return pTemp;
 }
