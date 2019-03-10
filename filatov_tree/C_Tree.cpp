@@ -7,7 +7,11 @@ tree::C_Tree::C_Tree() :
 
 tree::C_Tree::~C_Tree()
 {
-   // TODO: recursive clear
+   if (m_pRoot)
+   {
+      delete m_pRoot;
+      m_pRoot = nullptr;
+   }
 }
 
 void tree::C_Tree::Push(int a)
@@ -105,6 +109,19 @@ string tree::C_Tree::SymmetricPrint()
    m_pRoot->SymmetricPrint(strResult);
 
    return strResult;
+}
+
+tree::node_t::~node_t()
+{
+   if (this->leftPtr)
+   {
+      delete this->leftPtr;
+   }
+
+   if (this->rightPtr)
+   {
+      delete this->rightPtr;
+   }
 }
 
 void tree::node_t::Push(int a, CompareFunc compare)

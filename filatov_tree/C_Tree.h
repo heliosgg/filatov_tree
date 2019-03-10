@@ -21,6 +21,7 @@ namespace tree
          rightPtr(nullptr)
       {
       }
+      ~node_t();
 
       void Push(int a, CompareFunc compare);
       void ForwardPrint(string& result);
