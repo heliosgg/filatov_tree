@@ -30,6 +30,9 @@ void ThreadInput()
    A.MakeCopy(Res);
 
    Res.Intersect(B);
+
+   cout << A.ForwardPrint() << endl;
+   cout << B.SymmetricPrint() << endl;
 }
 
 int main()
